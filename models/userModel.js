@@ -15,9 +15,6 @@ const userSchema = new Schema({
         required: true,
         minlength: 6
     },
-    passwordConfirm: {
-        type: String
-    },
     email: {
         type: String, 
         required: true, 
@@ -105,6 +102,3 @@ userSchema.methods.createPasswordResetToken = async function() {
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
-// we created module that we import where we need
-// we use the import to interact with the 'Users' collection that
-// is generated automatically

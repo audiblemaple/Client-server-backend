@@ -3,7 +3,18 @@ const mongoose = require('mongoose');
 
 // get all work sessions
 const getAllWorkSessions = async (req, res) => {
-    const workSessions = await WorkSession.find({}).sort({createdAt: -1});
+    // it's working but 
+    // it's suppose to be from authorization header in browzer...
+    const { user_id } = req.params;
+    
+    // Get only work seesions from this current month
+    const currentDate = new Date();
+    const yearMonth = currentDate.toISOString().slice(0, 7);
+
+    const workSessions = await WorkSession.find({ 
+        user_id,
+        yearMonth 
+    }).sort({createdAt: -1});
 
     res.status(200)
     .json({
@@ -30,11 +41,11 @@ const getWorkSession = async (req, res) => {
 
 // create a new work session
 const createWorkSession = async (req, res) => {
-    const {user, clockIn} = req.body;
+    const {user_id, clockIn, yearMonth, day} = req.body;
 
     // add doc to DB
     try {
-        const workSession = await WorkSession.create({user, clockIn});
+        const workSession = await WorkSession.create({user_id, clockIn, yearMonth, day});
         res.status(201).json({
             status: "success",
             workSession
@@ -85,7 +96,7 @@ function checkWorkSessionStatus (workSession, res) {
     if (!workSession) {
         return res.status(400).json({
             status: 'fail',
-            error: 'No such user'
+            error: 'No such work session'
         })
     }
     

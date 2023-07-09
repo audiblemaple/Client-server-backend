@@ -21,6 +21,11 @@ To get started, follow these steps:
    npm install
    ```
 
+4. Press to start:
+   ```
+   npm run dev
+   ```
+
 ## Dependencies
 
 The project relies on the following dependencies:

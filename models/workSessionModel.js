@@ -3,19 +3,26 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const workSessionSchema = new Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
+    user_id: {
+        type: String,
         required: true
     },
-    clockIn: {
-        type: Date,
+    clockIn: {  // in format of HH:MM
+        type: String,
         required: true
     },
-    clockOut: {
-        type: Date
+    yearMonth: {     // in format of YYYY-MM
+        type: String,
+        required: true
     },
-    duration: {
+    day: {          // in format of DD
+        type: String,
+        required: true
+    },
+    clockOut: { // in format of HH:MM
+        type: String
+    },
+    duration: { // should be calculated in browser
         type: Number
     },
     user_note: {

@@ -6,15 +6,17 @@ const {
     deleteWorksession,
     updateWorkSession
 } = require('../controllers/workSessionsController')
-
-const WorkSession = require('../models/workSessionModel');
+//const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
+
+// require auth for all worksessions routes
+//router.use(requireAuth);
 
 // ROUTE HANDLERS
 
 // GET all work sessions
-router.get('/', getAllWorkSessions);
+router.get('/:user_id', getAllWorkSessions);
 
 //GET a single work session
 router.get('/:id', getWorkSession);

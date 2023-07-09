@@ -1,7 +1,6 @@
 const User = require('../models/userModel');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-//const sendEmail = require('../utils/email');
 const Email = require('../utils/email');
 const crypto = require('crypto');
 
@@ -175,25 +174,6 @@ const getUser = async (req, res) => {
     checkUserStatus(user, res);
 }
 
-// // create a new user
-// const createUser = async (req, res) => {
-//     const {username, password, email} = req.body;
-
-//     // add doc to DB
-//     try {
-//         const user = await User.create({username, password, email});
-//         res.status(201).json({
-//             status: "success",
-//             user
-//         })
-//     } catch (error) {
-//         res.status(400).json({
-//             status: 'fail',
-//             error: error.message
-//         })
-//     }
-// }
-
 // delete a user
 const deleteUser = async (req, res) => {
     const { id } = req.params
@@ -250,7 +230,6 @@ module.exports = {
     resetPassword,
     getAllUsers,
     getUser,
-    // createUser,
     deleteUser,
     updateUser
 }
