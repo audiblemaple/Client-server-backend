@@ -9,6 +9,17 @@ const createToken = (_id) => {
     return jwt.sign({_id}, process.env.SECRET, { expiresIn: '90d'})
 }
 
+const createSendToken = (user, res) => {
+    const token = createToken(user._id);
+
+        res.status(201).json({
+            status: "success",
+            username: user.username,
+            email: user.email,
+            token
+        })
+}
+
 // login user
 const loginUser = async (req, res) => {
     const {password, email} = req.body;
@@ -17,15 +28,9 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.login(password, email);
         
-        // create token
-        const token = createToken(user._id);
-
-        res.status(201).json({
-            status: "success",
-            username: user.username,
-            email,
-            token
-        })
+        // create and send token
+        createSendToken(user, res);
+        
     } catch (error) {
         res.status(400).json({
             status: 'fail',
@@ -41,19 +46,13 @@ const signupUser = async (req, res) => {
     // add doc to DB
     try {
         const user = await User.signup(username, password, email);
-        
+
+        // create and send token
+        createSendToken(user, res);
+
         // send welcome email
         await new Email(user, null).sendWelcome();
 
-        // create token
-        const token = createToken(user._id);
-
-        res.status(201).json({
-            status: "success",
-            username,
-            email,
-            token
-        })
     } catch (error) {
         res.status(400).json({
             status: 'fail',
@@ -105,7 +104,7 @@ const forgotPassword = async (req, res) => {
 }
 
 const resetPassword = async (req, res) => {
-    // 1. get user based on token
+    // get user based on token
     const hashedToken = crypto
     .createHash('sha256')
     .update(req.params.token)
@@ -117,12 +116,12 @@ const resetPassword = async (req, res) => {
     });
 
     try {
-        // 2. If token has not expired, and there is user, set new password
+        // If token has not expired, and there is user, set new password
         if (!user) {
             throw Error('Token is invalid or expired');
         }
 
-        // 3. send user.password to userModel function so it will hash it
+        // send user.password to userModel function so it will hash it
         const new_password = await User.renewPassword(req.body.password);
 
         user.password = new_password;
@@ -130,13 +129,8 @@ const resetPassword = async (req, res) => {
         user.passwordResetExpires = undefined;
         await user.save();
 
-        // 4. send token to client
-        const token = createToken(user._id);
-
-        res.status(201).json({
-            status: "success",
-            token
-        });
+        // create and send token
+        createSendToken(user, res);
 
     } catch (error) {
         res.status(400).json({

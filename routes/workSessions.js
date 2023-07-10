@@ -4,7 +4,8 @@ const {
     getWorkSession,
     createWorkSession,
     deleteWorksession,
-    updateWorkSession
+    updateWorkSession,
+    getNotClosedWorkSession
 } = require('../controllers/workSessionsController')
 //const requireAuth = require('../middleware/requireAuth');
 
@@ -15,11 +16,14 @@ const router = express.Router();
 
 // ROUTE HANDLERS
 
-// GET all work sessions
+// GET all work sessions for user
 router.get('/:user_id', getAllWorkSessions);
 
-//GET a single work session
-router.get('/:id', getWorkSession);
+// GET a single work session
+router.get('/single/:id', getWorkSession);
+
+// GET a single work session that is not closed
+router.get('/not_closed/:user_id', getNotClosedWorkSession); 
 
 //POST(create) a new work session
 router.post('/', createWorkSession);

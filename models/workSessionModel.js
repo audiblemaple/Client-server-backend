@@ -7,7 +7,7 @@ const workSessionSchema = new Schema({
         type: String,
         required: true
     },
-    clockIn: {  // in format of HH:MM
+    clockIn: {  // in format of HH:MM:SS
         type: String,
         required: true
     },
@@ -19,11 +19,11 @@ const workSessionSchema = new Schema({
         type: String,
         required: true
     },
-    clockOut: { // in format of HH:MM
+    clockOut: { // in format of HH:MM:SS
         type: String
     },
-    duration: { // should be calculated in browser
-        type: Number
+    duration: { // should be calculated in browser, format of HH:MM:SS
+        type: String
     },
     user_note: {
         type: String
