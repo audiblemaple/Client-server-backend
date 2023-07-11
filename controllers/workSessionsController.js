@@ -1,6 +1,7 @@
 const WorkSession = require('../models/workSessionModel');
 const User = require('../models/userModel');
 const mongoose = require('mongoose');
+const PDF_report = require('../utils/pdf-report');
 
     const checkObjectIdFormat = (id, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -51,12 +52,28 @@ const getAllWorkSessions = async (req, res) => {
             yearMonth 
         }).sort({createdAt: -1});
 
-        res.status(200)
-        .json({
+        if (req.query.generatePdfReport === 'true') {
+            // build work sessions report
+            const stream = res.writeHead(200, {
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': `attachment;filename=${yearMonth}_attendence_report.pdf`,
+            });
+            PDF_report.buildPDF(
+                user,
+                workSessions,
+                (chunk) => stream.write(chunk),
+                () => stream.end()
+            );
+        }
+
+        else {
+            res.status(200).json({
             status: 'success',
             requstedAt: req.requestTime,
             workSessions
         });
+        }
+
     } catch (error) {
         res.status(400).json({
             status: 'fail',

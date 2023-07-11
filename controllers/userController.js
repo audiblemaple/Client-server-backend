@@ -79,15 +79,13 @@ const forgotPassword = async (req, res) => {
             'host'
             )}/api/user/reset_password/${resetToken}`;
 
-        await new Email(user, resetURL).sendPasswordReset();
-
-
         res.status(200).json({
             status: "success",
             message: 'Password reset token generated and sent to email',
             // resetToken - not in res, only on email!
-        
         })
+
+        await new Email(user, resetURL).sendPasswordReset();
         
     } catch (error) {
         if (user) {

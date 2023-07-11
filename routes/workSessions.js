@@ -16,7 +16,9 @@ const router = express.Router();
 
 // ROUTE HANDLERS
 
-// GET all work sessions for user
+// two options
+// 1. /:user_id - GET all work sessions for user
+// 2. /:user_id?generatePdfReport=true - generate a PDF report 
 router.get('/:user_id', getAllWorkSessions);
 
 // GET a single work session
