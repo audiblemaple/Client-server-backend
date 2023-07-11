@@ -85,6 +85,7 @@ const forgotPassword = async (req, res) => {
             // resetToken - not in res, only on email!
         })
 
+        
         await new Email(user, resetURL).sendPasswordReset();
         
     } catch (error) {
