@@ -36,7 +36,7 @@ const getAllWorkSessions = async (req, res) => {
 
     checkObjectIdFormat(user_id, res);
 
-    try {
+    // try {
         const user = await User.findOne({ _id: user_id });
 
         if (!user) {
@@ -74,12 +74,12 @@ const getAllWorkSessions = async (req, res) => {
         });
         }
 
-    } catch (error) {
-        res.status(400).json({
-            status: 'fail',
-            error: error.message
-        })
-    }
+    // } catch (error) {
+    //     res.status(400).json({
+    //         status: 'fail',
+    //         error: error.message
+    //     })
+    // }
 }
 
 // get a single work session

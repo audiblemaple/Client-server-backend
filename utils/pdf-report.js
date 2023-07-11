@@ -1,5 +1,19 @@
 const PDFDocument = require('pdfkit-table');
 
+// Convert "HH:MM:SS" format into seconds
+function toSeconds(time) {
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return (hours * 60 + minutes) * 60 + seconds;
+}
+
+// Convert seconds back to "HH:MM:SS" format
+function toHHMMSS(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds].map(v => v < 10 ? '0' + v : v).join(':');
+}
+
 function buildPDF(user, workSessions, dataCallback, endCallback) {
     const doc = new PDFDocument({ margin: 30, size: 'A4', bufferPages: true, font: 'Courier' });
 
@@ -54,114 +68,29 @@ function buildPDF(user, workSessions, dataCallback, endCallback) {
         rows: rows
     };
 
-      doc.table(table, {
+    doc.table(table, {
         prepareHeader: () => doc.font("Helvetica-Bold").fontSize(12).fillColor('#812e2b'),
         prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
-          doc.font("Helvetica-Bold").fontSize(10).fillColor('#951814');
-          indexColumn === 0 && doc.addBackground(rectRow, 'pink', 0.15);
+            doc.font("Helvetica-Bold").fontSize(10).fillColor('#951814');
+            indexColumn === 0 && doc.addBackground(rectRow, 'pink', 0.15);
         },
-      });
-      doc.end();
+    });
 
+    // Calculate total seconds
+    let totalSeconds = workSessions.reduce((total, session) => {
+        return session.duration ? total + toSeconds(session.duration) : total;
+    }, 0);
 
+    // Convert total seconds back to "HH:MM:SS" format
+    let totalDuration = toHHMMSS(totalSeconds);
 
+    // Add total duration to the document
+    doc.moveDown().fontSize(12).fillColor('black')
+    .text(`Total Work Time: ${totalDuration}`, { align: 'center' });
+    // doc.moveDown().fontSize(12).fillColor('black')
+    // .text(`(in HH:MM:SS)`, { align: 'center' });
 
-
-
-
-
-
-
-
-
-
-
-
-
-    // // Set the header font style
-    // doc.font('Helvetica-Bold');
-    // doc.fontSize(20);
-
-    // // Set the header color
-    // doc.fillColor('red');
-    
-    // // Center align the header
-    // doc.text('SolidRun Attendence Report', { align: 'center' });
-    
-    // // Reset the font style and color
-    // doc.font('Helvetica');
-    // doc.fillColor('black');
-
-    // // Add the user's name
-    // doc.fontSize(12).text(`User: ${user.username}`);
-    // doc.moveDown();
-    
-
-    // doc.moveDown();
-    
-    // // Reset the font style
-    // doc.font('Helvetica');
-    // doc.fontSize(12);
-    
-    // // Iterate over workSessions and add relevant data to the PDF
-    // workSessions.forEach((session) => {
-    //     doc.text(`Date: ${session.day}`);
-    //     doc.text(`Clock In: ${session.clockIn}`);
-    //     doc.text(`Clock Out: ${session.clockOut}`);
-    //     doc.text(`Duration: ${session.duration}`);
-    //     doc.moveDown();
-    //     doc.moveDown();
-    // });
-
-    // doc.end();
+    doc.end();
 }
 
 module.exports = { buildPDF };
-
-
-
-
-
-// module.exports = class PDF_report {
-//     constructor(user, workSessions) {
-//         this.username = user.username;
-//         this.workSessions = workSessions;
-//     }
-
-//     async buildReportPDF() {
-//         // Create a new PDFDocument
-//         const doc = new PDFDocument();
-//         doc.data
-
-
-//         // Create a write stream to save the PDF document
-//         // const stream = fs.createWriteStream('report.pdf');
-//         // doc.pipe(stream);
-    
-//         doc.font('Helvetica-Bold');
-//         doc.fontSize(16).text('Work Session Report', { align: 'center' });
-    
-//         doc.moveDown();
-//         doc.font('Helvetica');
-    
-//         // Table headers
-//         doc.fontSize(12).text('Date', { width: 100, align: 'left' });
-//         doc.text('Clock In', { width: 100, align: 'left' });
-//         doc.text('Clock Out', { width: 100, align: 'left' });
-//         doc.text('Duration', { width: 100, align: 'left' });
-    
-//         // Table rows
-//         doc.fontSize(10);
-//         workSessions.forEach((session) => {
-//         doc.text(session.day, { width: 100, align: 'left' });
-//         doc.text(session.clockIn, { width: 100, align: 'left' });
-//         doc.text(session.clockOut || '-', { width: 100, align: 'left' });
-//         doc.text(session.duration ? session.duration.toString() : '-', { width: 100, align: 'left' });
-//         });
-    
-//         doc.end();
-//     }
-// }
-
-
-
