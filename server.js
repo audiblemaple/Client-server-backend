@@ -4,11 +4,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
 const workSessionsRoutes = require('./routes/workSessions');
+const cors = require('cors');
+const corsOptions = require('./config/corsOptions');
 
 const server_app = express();
 
 server_app.set('view engine', 'pug');
 server_app.set('views', path.join(__dirname, 'views'));
+
+server_app.use(cors(corsOptions));
+server_app.options('*', cors(corsOptions))
 
 //middleware
 
