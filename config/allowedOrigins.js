@@ -1,6 +1,5 @@
 const allowedOrigins = [
-    'https://client-server-frontend.onrender.com/',
-    'http://localhost:3000/'
+    'https://client-server-frontend.onrender.com/'
 ]
 
 module.exports = allowedOrigins;
