@@ -8,7 +8,7 @@ To get started, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/project.git
+   git clone [https://github.com/audiblemaple/Client-server-backend.git](https://github.com/audiblemaple/Client-server-backend.git)
    ```
 
 2. Navigate to the project directory:
