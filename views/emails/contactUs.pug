@@ -1,0 +1,11 @@
+extends baseEmail
+
+block content 
+    p Hi #{username},
+    p Thank you for reaching out to us. 
+    p Your referral was in subject: "#{query_subject}". 
+    p your message: 
+    p "#{message}".
+    p Our team is currently reviewing your inquiry and will be getting back to you shortly.
+    p If you have any additional information or questions, please feel free to contact us again.
+    p Thank you for choosing our services!
