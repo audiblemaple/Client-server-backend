@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, 'config.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
@@ -16,8 +16,8 @@ connectDB()
 // server_app.set('view engine', 'pug');
 // server_app.set('views', path.join(__dirname, 'views'));
 
-// server_app.use(cors(corsOptions));
-// server_app.options('*', cors(corsOptions))
+server_app.use(cors(corsOptions));
+server_app.options('*', cors(corsOptions))
 
 server_app.use(express.json()); // for req.body (enable access to data that was sent to server)
 server_app.use(cors())
