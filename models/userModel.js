@@ -30,42 +30,6 @@ const userSchema = new Schema({
     }
 }, { timestamps: true});
 
-
-// static signup method
-// we are using 'this' keyword so we must use regular function (instead of an arrow function)
-
-userSchema.statics.renewPassword = async function (new_password) {
-    console.log(new_password);
-    
-    // using salt and hashing the password with it
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(new_password, salt);
-
-    return hash;
-}
-
-userSchema.statics.signup = async function(username ,password, email) {
-    
-    const exists = await this.findOne({ email })
-
-    // although email is unique we want to address this error
-    if (exists) {
-        throw Error('Email already in use');
-    }
-
-    // using salt and hashing the password with it
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
-
-    const user = await this.create({
-        username,
-        password: hash,
-        email
-    })
-
-    return user;
-}
-
 // static login method
 userSchema.statics.login = async function(password, email) {
     const user = await this.findOne({ email });
@@ -84,20 +48,52 @@ userSchema.statics.login = async function(password, email) {
     return user;
 }
 
-userSchema.methods.createPasswordResetToken = async function() {
-    const resetToken = crypto.randomBytes(32).toString('hex');
+userSchema.statics.signup = async function(username ,password, email) {
+    const exists = await this.findOne({ email })
+    // although email is unique we want to address this error
+    if (exists) {
+        throw Error('Email already in use');
+    }
 
-    this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+    // using salt and hashing the password with it
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
 
-    console.log({resetToken}, this.passwordResetToken);
-
-    this.passwordResetExpires = Date.now() + 30 * 60 * 1000
-
-    return resetToken;
+    const user = await this.create({
+        username,
+        password: hash,
+        email
+    })
+    return user;
 }
+
+// static signup method
+// we are using 'this' keyword so we must use regular function (instead of an arrow function)
+
+// userSchema.statics.renewPassword = async function (new_password) {
+//     console.log(new_password);
+    
+//     // using salt and hashing the password with it
+//     const salt = await bcrypt.genSalt(10);
+//     const hash = await bcrypt.hash(new_password, salt);
+
+//     return hash;
+// }
+
+// userSchema.methods.createPasswordResetToken = async function() {
+//     const resetToken = crypto.randomBytes(32).toString('hex');
+
+//     this.passwordResetToken = crypto
+//     .createHash('sha256')
+//     .update(resetToken)
+//     .digest('hex');
+
+//     console.log({resetToken}, this.passwordResetToken);
+
+//     this.passwordResetExpires = Date.now() + 30 * 60 * 1000
+
+//     return resetToken;
+// }
 
 const User = mongoose.model('User', userSchema);
 

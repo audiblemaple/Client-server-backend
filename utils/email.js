@@ -7,28 +7,20 @@ module.exports = class Email {
         this.to = user.email;
         this.username = user.username;
         this.url = url;
-        this.from = `Solid Clock <${process.env.EMAIL_FROM}>`;
+        this.query_subject = user.query_subject;
+        this.message = user.message;
+        this.from = `MarketPath <${process.env.EMAIL_FROM}>`;
     }
 
-    newTransport() { // TODO: in .env set NODE_ENV=production before deploy
-        if (process.env.NODE_ENV == 'production') {
-            return nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.GMAIL_USERNAME,
-                    pass: process.env.GMAIL_PASSWORD,
-                }
-            })
-        }
-
+    newTransport() { // TODO: in userController signup, to uncomment the Email send action
         return nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
+            host: 'smtp.gmail.com',
+            port: 465,
             auth: {
-                user: process.env.EMAIL_USERNAME,
-                pass: process.env.EMAIL_PASSWORD,
+                user: process.env.GMAIL_USERNAME,
+                pass: process.env.GMAIL_PASSWORD,
             }
-        });
+        })
     }
 
     // send the actual email 
@@ -39,7 +31,9 @@ module.exports = class Email {
             {
                 username: this.username,
                 url: this.url,
-                subject
+                query_subject: this.query_subject,
+                message: this.message,
+                subject,
             }
         );
 
@@ -59,14 +53,21 @@ module.exports = class Email {
     async sendWelcome() {
         await this.send(
             'welcome', 
-            'Welcome to the SolidRun family!'
+            'Welcome to our MarketPath App!'
             );
     }
 
-    async sendPasswordReset() {
+    async sendContactUs() {
         await this.send(
-            'passwordReset', 
-            'Solid Clock - Your password reset token (valid only for 30 minutes)'
-        );
+            'contactUs',
+            'Thank You for Contacting Us! We Have Received Your Message'
+        )
     }
+
+    // async sendPasswordReset() {
+    //     await this.send(
+    //         'passwordReset', 
+    //         'Solid Clock - Your password reset token (valid only for 30 minutes)'
+    //     );
+    // }
 };

@@ -1,12 +1,15 @@
 const User = require('../models/userModel');
-const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const Email = require('../utils/email');
 const crypto = require('crypto');
+const express = require('express');
+
+const router = express.Router();
+// Entry Point: http://localhost:3000/users
 
 // create token
 const createToken = (_id) => {
-    return jwt.sign({_id}, process.env.SECRET, { expiresIn: '90d'})
+    return jwt.sign({_id}, process.env.JWT_SECRET, { expiresIn: '90d'})
 }
 
 const createSendToken = (user, res) => {
@@ -22,7 +25,7 @@ const createSendToken = (user, res) => {
 }
 
 // login user
-const loginUser = async (req, res) => {
+router.post('/login', async (req, res) => {
     const {password, email} = req.body;
     
     // add doc to DB
@@ -38,30 +41,44 @@ const loginUser = async (req, res) => {
             error: error.message
         })
     }
-}
+})
 
 // signup user
-const signupUser = async (req, res) => {
+router.post('/signup', async (req, res) => {
     const {username, password, email} = req.body;
-
     // add doc to DB
     try {
         const user = await User.signup(username, password, email);
-
         // create and send token
         createSendToken(user, res);
-
         // send welcome email
         await new Email(user, null).sendWelcome();
-
     } catch (error) {
         res.status(400).json({
             status: 'fail',
             error: error.message
         })
     }
-}
+});
 
+
+// Verify user token
+router.get('/auth', async (req, res) => {
+    const token = req.headers["x-access-token"]
+    try {
+        jwt.verify(token, process.env.JWT_SECRET)
+        res.send({message: "verified"});
+    } catch (e) {
+        if (e.name === 'JsonWebTokenError') {
+            const msg = e.message === 'jwt malformed' ? "No token provided" : "Invalid token" 
+            return res.status(401).json({message: msg})  
+        }
+        res.status(401).send(e)
+    }
+})
+
+
+/*
 // renew password
 const forgotPassword = async (req, res) => {
     // Get user based on email
@@ -141,89 +158,6 @@ const resetPassword = async (req, res) => {
 }
 
 
-// get all users
-const getAllUsers = async (req, res) => {
-    const users = await User.find({}).sort({createdAt: -1});
+*/
 
-    res.status(200)
-    .json({
-        status: 'success',
-        requstedAt: req.requestTime,
-        users
-    });
-}
-
-// get a single user
-const getUser = async (req, res) => {
-    const { id } = req.params
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({
-            status: 'fail',
-            error: 'Invalid user id'
-        })
-    }
-
-    const user = await User.findById(id)
-
-    checkUserStatus(user, res);
-}
-
-// delete a user
-const deleteUser = async (req, res) => {
-    const { id } = req.params
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({
-            status: 'fail',
-            error: 'Invalid user id'
-        })
-    }
-
-    const user = await User.findOneAndDelete({_id: id})
-
-    checkUserStatus(user, res);
-}
-
-// update a user
-const updateUser = async (req, res) => {
-    const { id } = req.params
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({
-            status: 'fail',
-            error: 'Invalid user id'
-        })
-    }
-
-    const user = await User.findOneAndUpdate({_id: id}, {
-        ...req.body
-    })
-
-    checkUserStatus(user, res);
-}
-
-// inner function to check if user is null and then
-// generate a response accordingly
-function checkUserStatus (user, res) {
-    if (!user) {
-        return res.status(400).json({
-            status: 'fail',
-            error: 'No such user'
-        })
-    }
-    
-    res.status(200).json({
-        status: 'success',
-        user
-    });
-}
-
-
-module.exports = {
-    signupUser,
-    loginUser,
-    forgotPassword,
-    resetPassword,
-    getAllUsers,
-    getUser,
-    deleteUser,
-    updateUser
-}
+module.exports = router
